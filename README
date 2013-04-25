@@ -1,0 +1,9 @@
+Plugins for https://github.com/jteeuwen/ircb
+
+- flip: Memetastic table and text flipper
+- forecast: Makes a pretty 2 day forecast for a given location
+
+To enable, add the following to ircb's main.go import section and run "go install":
+
+  _ "github.com/ianremmler/ircb_plugins/flip"
+  _ "github.com/ianremmler/ircb_plugins/forecast"
