@@ -29,9 +29,7 @@ type location struct {
 func init() { plugin.Register(New) }
 
 func New(profile string) plugin.Plugin {
-	plug := &Plugin{}
-	plug.Base = plugin.New(profile, "forecast")
-	return plug
+	return &Plugin{Base: plugin.New(profile, "forecast")}
 }
 
 func (p *Plugin) Load(client *proto.Client) error {
@@ -44,11 +42,9 @@ func (p *Plugin) Load(client *proto.Client) error {
 		Description: "Print a pretty forecast for the given location",
 		Execute:     forecastCmd,
 	}
-	cmnd.Params = []cmd.Param{{
-		Name:        "loc",
-		Description: "Location to get forecast for",
-		Pattern:     cmd.RegAny,
-	}}
+	cmnd.Params = []cmd.Param{
+		{Name: "loc", Description: "Location to get forecast for", Pattern: cmd.RegAny},
+	}
 	cmd.Register(cmnd)
 
 	return nil
