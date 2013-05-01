@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/go-charset/charset"
 	"github.com/jteeuwen/go-pkg-xmlx"
 
+	"errors"
 	"fmt"
 	"go/build"
 	"math"
@@ -15,21 +16,22 @@ const (
 	arrows      = "↑↗→↘↓↙←↖"
 	firstOctile = 0x2581
 	maxHours    = 48
+	fcErr       = "Error retrieving forecase"
 )
 
-func forecast(loc location) string {
+func forecast(loc location) (string, error) {
 	charset.CharsetDir = build.Default.GOPATH + "/src/code.google.com/p/go-charset/datafiles"
 	doc := xmlx.New()
 	url := fmt.Sprintf(fcUrlFmt, loc.Lat, loc.Lon)
 	err := doc.LoadUri(url, charset.NewReader)
 	if err != nil {
-		return ""
+		return "", errors.New(fcErr)
 	}
 
 	startTimeNodes := doc.SelectNodes("", "start-valid-time")
 	endTimeNodes := doc.SelectNodes("", "end-valid-time")
 	if len(startTimeNodes) == 0 || len(endTimeNodes) == 0 {
-		return ""
+		return "", errors.New(fcErr)
 	}
 	if len(endTimeNodes) > maxHours {
 		endTimeNodes = endTimeNodes[:maxHours]
@@ -70,7 +72,7 @@ func forecast(loc location) string {
 	out += fmt.Sprintf("Wind mph %7s %s\n", speedRange, speedGraph)
 	out += fmt.Sprintf("Wind dir         %s\n", dirGraph)
 
-	return out
+	return out, nil
 }
 
 func minmax(vals []int) (int, int) {

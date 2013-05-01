@@ -56,7 +56,8 @@ func forecastCmd(cmd *cmd.Command, client *proto.Client, msg *proto.Message) {
 	if !msg.FromChannel() {
 		targ = msg.SenderName
 	}
-	const locErr = "I had a problem finding the location."
+	const locErr = "I had a problem finding that location."
+	const fcErr = "I had a problem getting a forecast for that location."
 
 	resp, err := http.Get(fmt.Sprintf(locUrlFmt, loc))
 	if err != nil {
@@ -75,7 +76,11 @@ func forecastCmd(cmd *cmd.Command, client *proto.Client, msg *proto.Message) {
 		client.PrivMsg(targ, locErr)
 		return
 	}
-	fc := forecast(locs[0])
+	fc, err := forecast(locs[0])
+	if err != nil {
+		client.PrivMsg(targ, fcErr)
+		return
+	}
 	for _, line := range strings.Split(fc, "\n") {
 		client.PrivMsg(targ, line)
 	}
